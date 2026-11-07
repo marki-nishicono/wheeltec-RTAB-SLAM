@@ -1,0 +1,34 @@
+<launch>
+  <arg name="wheelbase" default="0.143"/>
+  <arg name="motion_enabled" default="false"/>
+  <arg name="lidar_model" default="M10_P"/>
+  <!-- Provisional mini_akm factory extrinsics. Confirm physical mounting. -->
+  <arg name="laser_x" default="0.125"/><arg name="laser_z" default="0.15"/>
+  <arg name="laser_yaw" default="3.141592653589793"/>
+  <arg name="camera_x" default="0.185"/><arg name="camera_z" default="0.10"/>
+  <node pkg="turn_on_wheeltec_robot" type="wheeltec_robot_node" name="lab_base" output="screen" required="true">
+    <param name="usart_port_name" value="/dev/wheeltec_controller"/>
+    <param name="serial_baud_rate" value="115200"/>
+    <param name="odom_frame_id" value="wheel_odom"/>
+    <param name="robot_frame_id" value="base_footprint"/>
+    <param name="gyro_frame_id" value="gyro_link"/>
+    <remap from="odom" to="/wheel/odom"/>
+  </node>
+  <node pkg="lslidar_x10_driver" type="lslidar_x10_driver_node" name="lab_lidar" output="screen" required="true">
+    <param name="lidar_name" value="$(arg lidar_model)"/><param name="serial_port" value="/dev/wheeltec_lidar"/>
+    <param name="interface_selection" value="serial"/><param name="frame_id" value="laser"/>
+    <param name="min_distance" value="0.15"/><param name="max_distance" value="20.0"/>
+    <param name="scan_topic" value="scan"/><param name="use_gps_ts" value="false"/>
+  </node>
+  <node pkg="tf2_ros" type="static_transform_publisher" name="lab_laser_tf" args="$(arg laser_x) 0 $(arg laser_z) $(arg laser_yaw) 0 0 base_footprint laser"/>
+  <node pkg="tf2_ros" type="static_transform_publisher" name="lab_camera_tf" args="$(arg camera_x) 0 $(arg camera_z) 0 0 0 base_footprint camera_link"/>
+  <node pkg="tf2_ros" type="static_transform_publisher" name="lab_imu_tf" args="0 0 0 0 0 0 base_footprint gyro_link"/>
+  <node pkg="wheeltec_rtabmap_lab" type="imu_calibration.py" name="lab_imu_calibration" output="screen"/>
+  <node pkg="robot_localization" type="ekf_localization_node" name="lab_ekf" output="screen">
+    <rosparam command="load" file="$(find wheeltec_rtabmap_lab)/config/ekf.yaml"/>
+  </node>
+  <node pkg="wheeltec_rtabmap_lab" type="control_guard.py" name="lab_control_guard" output="screen" required="true">
+    <param name="motion_enabled" value="$(arg motion_enabled)"/>
+    <param name="wheelbase" value="$(arg wheelbase)"/>
+  </node>
+</launch>

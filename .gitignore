@@ -1,0 +1,38 @@
+# Python and test caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+
+# Local environments and editor state
+.runtime/
+.venv/
+venv/
+.idea/
+.vscode/
+*.swp
+*~
+
+# ROS/catkin generated files
+build/
+devel/
+install/
+log/
+.catkin_tools/
+
+# Runtime data and generated exports
+results/
+*.db
+*.db-*
+*.bag
+*.bag.active
+*.jsonl
+*.log
+
+# External source trees, downloaded archives, and papers/reference material
+third_party/
+tmp/
+
+# OS metadata
+.DS_Store
+Thumbs.db

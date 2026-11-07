@@ -1,0 +1,19 @@
+[Unit]
+Description=WHEELTEC lab sensor stack and motion watchdog
+StartLimitIntervalSec=0
+Requires=wheeltec-lab-master.service
+After=wheeltec-lab-master.service
+
+[Service]
+Type=simple
+ExecStart=/home/wheeltec/wheeltec_slam_ws/src/wheeltec_rtabmap_lab/scripts/start_vehicle.sh sensors true
+# roslaunch can return success when a required node crashes.
+Restart=always
+RestartSec=5
+KillSignal=SIGINT
+KillMode=control-group
+TimeoutStopSec=20
+StandardOutput=journal
+StandardError=journal
+
+# Deliberately no Install target: start explicitly for attended sessions.

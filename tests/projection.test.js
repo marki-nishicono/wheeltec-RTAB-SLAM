@@ -1,0 +1,14 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
+const source=fs.readFileSync('web/app.js','utf8');
+const context={canvas:{clientWidth:640,clientHeight:480},mode:3,center:[0,0],scale:100,yaw:0,tilt:.75,cameraZoom:1,state:{}};
+vm.createContext(context);
+vm.runInContext(source.slice(source.indexOf('function project(p)'),source.indexOf('function path(')),context);
+assert(context.project([0,0,1])[1]<context.project([0,0,0])[1],'positive Z must move UP on screen');
+context.mode=4;
+context.state={ages:{camera_pose:.1},camera_view:{width:640,height:480,k:[500,0,320,0,500,240,0,0,1],map_from_camera:[[1,0,0,2],[0,1,0,3],[0,0,1,4],[0,0,0,1]]}};
+assert.deepEqual(Array.from(context.project([2,3,6])).slice(0,2),[320,240]);
+assert(context.project([2,2,6])[1]<240,'optical negative Y projects up');
+assert(context.project([3,3,6])[0]>320,'optical positive X projects right');
+assert.equal(context.project([2,3,3]),null,'clip points behind camera');
+context.state.ages.camera_pose=5;assert.equal(context.project([2,3,6]),null);
+console.log('Z-up, camera pose/intrinsics, clipping and stale camera pose: PASS');

@@ -1,0 +1,9 @@
+[Unit]
+Description=Independent ROS master for WHEELTEC lab
+StartLimitIntervalSec=0
+[Service]
+ExecStart=/home/wheeltec/wheeltec_slam_ws/src/wheeltec_rtabmap_lab/scripts/start_vehicle.sh master
+Restart=always
+RestartSec=3
+KillSignal=SIGINT
+TimeoutStopSec=20

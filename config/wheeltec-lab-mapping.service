@@ -1,0 +1,11 @@
+[Unit]
+Description=WHEELTEC RTAB-Map and browser bridge (recover in localization mode)
+Requires=wheeltec-lab-master.service
+After=wheeltec-lab-master.service
+StartLimitIntervalSec=0
+[Service]
+ExecStart=/home/wheeltec/wheeltec_slam_ws/src/wheeltec_rtabmap_lab/scripts/start_vehicle.sh recover
+Restart=always
+RestartSec=5
+KillSignal=SIGINT
+TimeoutStopSec=30

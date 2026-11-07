@@ -1,0 +1,38 @@
+<launch>
+  <arg name="database" default="$(env HOME)/wheeltec_slam_runtime/maps/lab.db"/>
+  <arg name="localization" default="false"/>
+  <node pkg="wheeltec_rtabmap_lab" type="rgbd_frontend.py" name="lab_rgbd" output="screen">
+    <rosparam command="load" file="$(find wheeltec_rtabmap_lab)/config/astra_rgb_640.yaml" param="calibration"/>
+  </node>
+  <group ns="rtabmap">
+    <node pkg="rtabmap_slam" type="rtabmap" name="rtabmap" output="screen">
+      <param name="frame_id" value="base_footprint"/>
+      <param name="odom_frame_id" value="odom"/>
+      <param name="map_frame_id" value="map"/>
+      <param name="subscribe_depth" value="true"/>
+      <param name="subscribe_rgb" value="true"/>
+      <param name="subscribe_scan" value="true"/>
+      <param name="approx_sync" value="true"/>
+      <param name="approx_sync_max_interval" value="0.12"/>
+      <param name="topic_queue_size" value="5"/>
+      <param name="sync_queue_size" value="10"/>
+      <param name="wait_for_transform" value="0.2"/>
+      <param name="database_path" value="$(arg database)"/>
+      <param name="publish_tf" value="true"/>
+      <param name="pub_loc_pose_only_when_localizing" value="true"/>
+      <param name="map_always_update" value="false"/>
+      <param name="map_empty_ray_tracing" value="false"/>
+      <remap from="rgb/image" to="/lab/rgb/image"/>
+      <remap from="depth/image" to="/lab/depth/image"/>
+      <remap from="rgb/camera_info" to="/lab/rgb/camera_info"/>
+      <remap from="scan" to="/scan"/>
+      <remap from="odom" to="/odometry/filtered"/>
+      <rosparam command="load" file="$(find wheeltec_rtabmap_lab)/config/rtabmap.yaml"/>
+      <param name="Mem/InitWMWithAllNodes" value="false" type="string"/>
+      <param name="RGBD/StartAtOrigin" value="false" type="string"/>
+      <param if="$(arg localization)" name="Mem/IncrementalMemory" value="false" type="string"/>
+      <param if="$(arg localization)" name="Mem/InitWMWithAllNodes" value="true" type="string"/>
+    </node>
+  </group>
+  <node pkg="wheeltec_rtabmap_lab" type="edge_bridge.py" name="lab_edge_bridge" output="screen"/>
+</launch>

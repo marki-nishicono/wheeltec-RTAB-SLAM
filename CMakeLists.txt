@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.0.2)
+project(wheeltec_rtabmap_lab)
+find_package(catkin REQUIRED)
+catkin_package()
+catkin_install_python(PROGRAMS scripts/edge_bridge.py scripts/control_guard.py scripts/rgbd_frontend.py scripts/imu_calibration.py DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+install(DIRECTORY launch config DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+install(FILES scripts/map_sessions.py scripts/video_stream.py scripts/control_socket.py scripts/battery_monitor.py DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
